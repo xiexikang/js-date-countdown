@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>js拼团日期倒计时</title>
@@ -9,12 +8,21 @@
 </head>
 <body>
 
-<div class="mytime jsTime" data-time="2019-04-04 16:58:00">时间1</div>
-<div class="mytime jsTime" data-time="2019-04-05 14:00:02">时间2</div>
-<div class="mytime jsTime" data-time="2019-04-06 18:01:31">时间3</div>
-<div class="mytime jsTime" data-time="2019-04-07 05:05:15">时间4</div>
-<div class="mytime jsTime" data-time="2019-04-08 09:22:43">时间5</div>
+<div class="mytime jsTime" data-time="2019-04-01 16:58:00">时间1</div>
+<div class="mytime jsTime" data-time="2019-04-04 18:00:02">时间2</div>
+<div class="mytime jsTime" data-time="2019-04-05 19:01:31">时间3</div>
+<div class="mytime jsTime" data-time="2019-04-06 05:05:15">时间4</div>
+<div class="mytime jsTime" data-time="2019-04-07 09:01:43">时间5</div>
+<hr>
+<div class="mytime jsTime2" data-time="2019-04-08 16:30:05">时间1</div>
+<div class="mytime jsTime2" data-time="2019-04-09 14:01:22">时间2</div>
+<div class="mytime jsTime2" data-time="2019-04-10 18:06:25">时间3</div>
+<div class="mytime jsTime2" data-time="2019-04-11 22:07:19">时间4</div>
+<div class="mytime jsTime2" data-time="2019-04-12 23:12:38">时间5</div>
 
+</body>
+
+<!-- 方法1 -->
 <script>
     const countdown = {
         domList : document.querySelectorAll('.jsTime'),
@@ -24,7 +32,7 @@
             return n[1] ? n : '0' + n;
         },
         setTime(dom){
-            //获取设置的时间 如：2019-04-04 17:00:00  ios系统得加正则.replace(/\-/g, '/');
+            //获取设置的时间 如：2019-3-28 14:00:00  ios系统得加正则.replace(/\-/g, '/');
             const leftTime = new Date(dom.getAttribute('data-time').replace(/\-/g, '/')) - new Date();
             if (leftTime >= 0) {
                 const d = Math.floor(leftTime / 1000 / 60 / 60 / 24);
@@ -40,14 +48,62 @@
         start(){
             this.domList.forEach((dom) => {
                 this.setTime(dom);
-            dom.$timer = setInterval(() => {
+                dom.$timer = setInterval(() => {
                     this.setTime(dom);
-        }, 1e3);
-        });
+                }, 1e3);
+            });
         },
     };
     countdown.start();
 </script>
 
-</body>
+<!-- 方法2 -->
+<script>
+    //时间格式处理
+    const formatNumber = n => {
+        n = n.toString();
+        return n[1] ? n : '0' + n;
+    };
+    //团购倒计时
+    const teamCountTime = (obj) => {
+        var timer = null;
+        function fn(){
+            //获取设置的时间 如：2019-3-28 14:00:00  ios系统得加正则.replace(/\-/g, '/');
+            var setTime = obj.getAttribute('data-time').replace(/\-/g, '/');
+            //获取当前时间
+            var date    = new Date(),
+                now     = date.getTime(),
+                endDate = new Date(setTime),
+                end     = endDate.getTime();
+            //时间差
+            var leftTime = end - now;
+            //d,h,m,s 天时分秒
+            var d, h,m,s;
+            var otime = '';
+            if (leftTime >= 0) {
+                d = Math.floor(leftTime / 1000 / 60 / 60 / 24);
+                h = Math.floor(leftTime / 1000 / 60 / 60 % 24);
+                m = Math.floor(leftTime / 1000 / 60 % 60);
+                s = Math.floor(leftTime / 1000 % 60);
+                if (d <= 0) {
+                    otime = [h, m, s].map(formatNumber).join(':');
+                } else {
+                    otime = d + '天' + [h, m, s].map(formatNumber).join(':');
+                }
+                obj.innerHTML = '剩余' + otime;
+                //
+                timer = setTimeout(fn, 1e3);
+            } else {
+                clearTimeout(timer);
+                obj.innerHTML = '拼团已结束';
+            }
+        }
+        fn();
+    };
+    let jsTimes = document.querySelectorAll('.jsTime2');
+    jsTimes.forEach((obj) => {
+        teamCountTime(obj);
+    });
+</script>
+
 </html>
